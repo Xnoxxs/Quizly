@@ -54,9 +54,6 @@ fun MyApp(navController: NavHostController, viewModel: CardViewModel) {
 
     var currentCard by remember { mutableStateOf<Card?>(null) }
 
-    // Firebase stream placeholder; will hook Firestore Flow later
-    val words by remember { mutableStateOf<Map<String, Map<String, Any>>>(emptyMap()) }
-
     val categories = listOf("Words", "Test")
 
     var isSearchBarVisible by remember { mutableStateOf(false) }
@@ -93,24 +90,30 @@ fun MyApp(navController: NavHostController, viewModel: CardViewModel) {
                 .padding(horizontal = 20.dp)
         ) {
 
-            /* ---------------- Search Button ---------------- */
-            Button(
-                {
-                    isSearchBarVisible = true
-                },
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Black)) {
-                Text("Search", color = Color.White)
-            }
-
-            Spacer(Modifier.height(30.dp))
-
             if (isSearchBarVisible) {
-                FullScreenSearchBar(
+                Search(
                     currentCard = { card -> currentCard = card },
                     cards = cards,
                     onClose = { isSearchBarVisible = false }
                 )
             }
+
+            Spacer(Modifier.height(30.dp))
+
+
+            /* ---------------- Search Button ---------------- */
+            Button(
+                {
+                    isSearchBarVisible = true
+                },
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
+                modifier = Modifier.fillMaxWidth()       // ← makes it span the full width
+            ) {
+                Text("Search", color = Color.White)
+            }
+
+            Spacer(Modifier.height(30.dp))
+
 
             /* ---------------- Header Row ------------------ */
             Row(
@@ -119,7 +122,7 @@ fun MyApp(navController: NavHostController, viewModel: CardViewModel) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 BigText(currentMode)
-                Text(" (${cards.size})", style = MaterialTheme.typography.bodySmall)
+                SmallText(" (${cards.size})")
 
                 Spacer(Modifier.width(20.dp))
                 MyIconButton(icon = Icons.Default.ChangeCircle) {
@@ -138,7 +141,7 @@ fun MyApp(navController: NavHostController, viewModel: CardViewModel) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    SmallText("$amountOfWords / ${words.size}")
+                    SmallText("$amountOfWords / ${cards.size}")
                     Spacer(Modifier.width(40.dp))
                     Icon(
                         Icons.Default.ReplayCircleFilled, null,
@@ -163,12 +166,15 @@ fun MyApp(navController: NavHostController, viewModel: CardViewModel) {
                     .padding(vertical = 10.dp)
             ) {
                 CardBox(
-                    card = currentCard
-                )
-                Divider(thickness = 2.dp, color = Color.Black)
-                Spacer(Modifier.height(20.dp))
-                Examples(words)
+                    currentCard = currentCard,
+                    navController = navController,
+                    viewModel = viewModel
+                ) {
+                    currentCard = null            // parent owns the state, so it can mutate it
+                    amountOfWords -= 1
+                }
             }
+
         }
     }
 }
@@ -187,147 +193,5 @@ fun BigText(text: String) =
 
 @Composable
 fun SmallText(text: String) =
-    Text(text, style = MaterialTheme.typography.bodySmall)
-
-
-@Composable
-fun CardBox(
-    card: Card?, // Card(id=1, card="oooo", value="aaaa")
-    onAddToTest: () -> Unit = {},
-    onEdit: () -> Unit = {},
-    onDelete: () -> Unit = {}
-) {
-    var isFlipped by remember { mutableStateOf(false) }
-
-    val rotationYValue by animateFloatAsState(
-        targetValue = if (isFlipped) 180f else 0f,
-        animationSpec = tween(durationMillis = 500),
-        label = "flipAnimation"
-    )
-
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(200.dp)
-            .clickable { isFlipped = !isFlipped }
-            .graphicsLayer {
-                rotationY = rotationYValue
-                cameraDistance = 8 * density
-            }
-            .background(Color.LightGray)
-    ) {
-        // Front side
-        if (rotationYValue <= 90f) {
-            Text(
-                text = card?.card ?: "No word selected",
-                style = MaterialTheme.typography.headlineMedium,
-                modifier = Modifier.align(Alignment.Center)
-            )
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.BottomCenter)
-                    .padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Button(
-                    onClick = onAddToTest,
-                    shape = CircleShape,
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.Black)
-                ) {
-                    Text("Add To Test", color = Color.White)
-                }
-
-                Row {
-                    IconButton(onClick = onEdit) {
-                        Icon(Icons.Default.Edit, contentDescription = "Edit")
-                    }
-                    IconButton(onClick = onDelete) {
-                        Icon(Icons.Default.Delete, contentDescription = "Delete")
-                    }
-                }
-            }
-        } else {
-            // Back side
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .graphicsLayer { rotationY = 180f },
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = card?.value ?: "",
-                    style = MaterialTheme.typography.headlineMedium
-                )
-            }
-        }
-    }
-}
-
-
-
-@Composable
-fun Examples(words: Map<String, Map<String, Any>>) {
-    /* TODO: real examples list */
-    Text("Examples placeholder")
-}
-
-@Composable
-fun FullScreenSearchBar(
-    currentCard: (Card?) -> Unit,
-    cards: List<Card>,
-    onClose: () -> Unit
-) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.White)
-            .padding(16.dp)
-    ) {
-        Column {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                IconButton(onClick = onClose) {
-                    Icon(Icons.Default.ArrowBack, contentDescription = "Back")
-                }
-                Text("Search", style = MaterialTheme.typography.headlineMedium)
-                IconButton(onClick = onClose) {
-                    Icon(Icons.Default.Close, contentDescription = "Close")
-                }
-            }
-            Spacer(Modifier.height(16.dp))
-            var searchText by remember { mutableStateOf("") }
-            TextField(
-                value = searchText,
-                onValueChange = { searchText = it },
-                label = { Text("Search") },
-                modifier = Modifier.fillMaxWidth()
-            )
-            // Add your list of search results here
-            // For example:
-            Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-                cards.forEach { card ->
-                    Text(
-                        text = card.card,
-                        style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier
-                            .padding(vertical = 8.dp)
-                            .fillMaxWidth()
-                            .clickable {
-                                currentCard(card)
-                                Log.d("SelectedCard", "You selected: ${card.card}")
-                                onClose()
-                            }
-                    )
-                }
-            }
-
-        }
-    }
-}
+    Text(text, style = MaterialTheme.typography.bodyLarge)
 

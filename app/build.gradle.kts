@@ -4,6 +4,9 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     id("org.jetbrains.kotlin.kapt")
+    alias(libs.plugins.google.gms.google.services)
+
+
 }
 
 android {
@@ -74,6 +77,19 @@ dependencies {
     kapt("androidx.room:room-compiler:2.6.1") // <-- REQUIRED for AppDatabase_Impl
 
     implementation ("com.google.code.gson:gson:2.10.1")
+
+    // 1️⃣  Firebase Bill-of-Materials (pins all Firebase libs to same version)
+    // 2️⃣  The only SDK you need: Firebase Auth
+    implementation(platform("com.google.firebase:firebase-bom:33.15.0"))
+    implementation("com.google.firebase:firebase-auth-ktx")
+
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.squareup.moshi:moshi-kotlin:1.15.0")
+
+
+    implementation("io.coil-kt:coil-compose:2.5.0")
+
 
 }
 

@@ -1,5 +1,3 @@
-
-
 package com.example.quizly
 
 import android.util.Log
@@ -24,169 +22,121 @@ import androidx.compose.ui.text.font.FontWeight
 
 import com.example.quizly.Database.CardViewModel
 
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.Scaffold
+
+
+import kotlinx.coroutines.launch
+
 
 @Composable
 fun AddCard(
     viewModel: CardViewModel,
+    onBack: () -> Unit = {}
 ) {
 
-    val cards by viewModel.cards.collectAsState()
+    var card        by remember { mutableStateOf("") }
+    var value       by remember { mutableStateOf("") }
 
-    var card by remember { mutableStateOf("") }
-    var value by remember { mutableStateOf("") }
+    /* ---------- snackbar host ---------- */
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope             = rememberCoroutineScope()
 
-    var isAddExtra by remember { mutableStateOf(false) }
-    var extra by remember { mutableStateOf("") }
-    var extraValue by remember { mutableStateOf("") }
+    Scaffold(
+        snackbarHost = {
+            Box(Modifier.fillMaxSize()) {
+                SnackbarHost(
+                    hostState = snackbarHostState,
+                    modifier  = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(top = 12.dp)          // small inset from status bar
+                )
+            }
+        }
+    ) { innerPadding ->
 
-    var extras = remember { mutableStateOf(mapOf<String, String>()) }
-
-
-    Column(modifier = Modifier
-        .fillMaxSize()
-        .padding(horizontal = 16.dp)
-    ) {
-        // Top App Bar
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 16.dp, bottom = 24.dp)
+                .padding(innerPadding)
+                .fillMaxSize()
+                .padding(horizontal = 16.dp)
         ) {
-            IconButton(onClick = {}) {
-                Icon(Icons.Default.ArrowBack, contentDescription = "Back")
-            }
-            Spacer(modifier = Modifier.weight(1f))
-            Text("Add", style = MaterialTheme.typography.titleLarge)
-            Spacer(modifier = Modifier.weight(1f))
-            Spacer(modifier = Modifier.width(48.dp)) // space to balance arrow
-        }
 
-        LazyColumn {
-            items(cards) { card ->
-                LaunchedEffect(card.id) {
-                    Log.d("CardScreen", "Rendering card: ${card.value}")
-                }
-                Text(card.value, modifier = Modifier.padding(vertical = 4.dp))
-            }
-        }
-
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            OutlinedTextField(
-                value = card,
-                onValueChange = { card = it },
-                label = { Text("Add Card") },
-                modifier = Modifier.weight(1f)
-            )
-            OutlinedTextField(
-                value = value,
-                onValueChange = { value = it },
-                label = { Text("Add Value") },
-                modifier = Modifier.weight(1f)
-            )
-        }
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        // Extra + Plus Button
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text("Extra", style = MaterialTheme.typography.titleMedium)
-            Spacer(modifier = Modifier.width(8.dp))
-            IconButton(
-                onClick = { isAddExtra = true },
+            /* ---------- Top bar ---------- */
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
-                    .size(32.dp)
-                    .background(Color.Black, shape = CircleShape)
+                    .fillMaxWidth()
+                    .padding(top = 16.dp, bottom = 24.dp)
             ) {
-                Icon(Icons.Default.Add, contentDescription = "Add Extra", tint = Color.White)
-            }
-        }
-
-        if(isAddExtra == true) {
-            Column {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    OutlinedTextField(
-                        value = extra,
-                        onValueChange = { extra = it},
-                        label = { Text("Add Extra") },
-                        modifier = Modifier.weight(1f)
-                    )
-                    OutlinedTextField(
-                        value = extraValue,
-                        onValueChange = { extraValue = it},
-                        label = { Text("Add Value") },
-                        modifier = Modifier.weight(1f)
-                    )
+                IconButton(onClick = onBack) {
+                    Icon(Icons.Default.ArrowBack, contentDescription = "Back")
                 }
-                Button(
-                    onClick = {
-                        println("✅ App started")
+                Spacer(Modifier.weight(1f))
+                Text("Add", style = MaterialTheme.typography.titleLarge)
+                Spacer(Modifier.weight(1f))
+                Spacer(Modifier.width(48.dp))
+            }
 
-                        if (extra.isNotBlank() && extraValue.isNotBlank()) {
-                            // Add to Extras
-                            println("✅ Great")
-                            // Add a key-value pair
-                            extras.value = extras.value + (extra to extraValue)
-                            Log.d("extras", extras.toString())
-                        } else {
-                            Log.d("extras", "Nothing ")
+            Spacer(Modifier.height(24.dp))
 
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                OutlinedTextField(
+                    value = card,
+                    onValueChange = { card = it },
+                    label = { Text("Add Card") },
+                    modifier = Modifier.weight(1f)
+                )
+                OutlinedTextField(
+                    value = value,
+                    onValueChange = { value = it },
+                    label = { Text("Add Value") },
+                    modifier = Modifier.weight(1f)
+                )
+            }
+
+            Spacer(Modifier.weight(1f))
+
+            /* ---------- Add button ---------- */
+            Button(
+                onClick = {
+                    scope.launch {
+                        try {
+                            viewModel.addCard(card, value)
+                            snackbarHostState.showSnackbar(
+                                message  = "Card added!",
+                                duration = SnackbarDuration.Short
+                            )
+                            // clear fields after success
+                            card  = ""
+                            value = ""
+                        } catch (e: Exception) {
+                            Log.e("AddCard", "Failed to add card", e)
+                            snackbarHostState.showSnackbar(
+                                message  = "Failed to add card",
+                                duration = SnackbarDuration.Short
+                            )
                         }
-                    },
-                    modifier = Modifier
-                        .height(56.dp)
-                        .padding(bottom = 24.dp),
-                    shape = RoundedCornerShape(32.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.Black)
-                ) {
-                    Text("Add", color = Color.White)
-                }
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp)
+                    .padding(bottom = 24.dp),
+                shape  = RoundedCornerShape(32.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Black)
+            ) {
+                Text("Add", color = Color.White)
             }
-        }
-
-        extras.value.forEach { (key, value) ->
-            ExtraRow(keyText = key, valueText = value, extras = extras)
-        }
-
-        Spacer(modifier = Modifier.weight(1f))
-
-        // Add Button (Bottom)
-        Button(
-            onClick = {
-
-                // card = "hello"
-                // value = "salut"
-                // extras = {"time": "temp"}
-                Log.d("AddCard", "Logging")
-                try {
-                    viewModel.addCard(card, value)
-                } catch (e: Exception) {
-                    Log.e("AddCard", "Failed to add card: ${e.message}", e)
-                }
-
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp)
-                .padding(bottom = 24.dp),
-            shape = RoundedCornerShape(32.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color.Black)
-        ) {
-            Text("Add", color = Color.White)
         }
     }
 }
+
 
 
 @Composable

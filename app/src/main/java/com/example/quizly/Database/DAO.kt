@@ -12,6 +12,17 @@ interface CardDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertCard(card: Card)
 
-    @Query("UPDATE cards SET value = :newValue WHERE id = :cardId")
-    suspend fun updateCardValue(cardId: Int, newValue: String)
+    @Query("UPDATE cards SET card = :newCard, value = :newValue WHERE id = :id")
+    suspend fun updateCard(id: Int, newCard: String, newValue: String)
+
+    @Query("SELECT * FROM cards WHERE id = :cardId LIMIT 1")
+    suspend fun getCardById(cardId: Int): Card?
+
+
+    @Query("DELETE FROM cards WHERE id = :cardId")
+    suspend fun deleteCardById(cardId: Int)
+
+
+
+
 }

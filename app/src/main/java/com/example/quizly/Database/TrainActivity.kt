@@ -92,7 +92,6 @@ fun CardScreen(viewModel: CardViewModel) {
         )
         Button(
             onClick = {
-                viewModel.updateCardValue(cardId.toInt(), "AAAA")
             },
             modifier = Modifier.fillMaxWidth()
         ) {
