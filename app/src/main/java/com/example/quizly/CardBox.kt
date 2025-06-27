@@ -13,12 +13,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -47,11 +44,10 @@ fun CardBox(
     currentCard: Card?,
     navController: NavHostController,
     viewModel: CardViewModel,
-    onDelete: () -> Unit          // ← new event
-
+    onDelete: () -> Unit
 ) {
     var isFlipped  by remember { mutableStateOf(false) }
-    var showDialog by remember { mutableStateOf(false) }   // ← NEW
+    var showDialog by remember { mutableStateOf(false) }
 
     val rotationYValue by animateFloatAsState(
         targetValue = if (isFlipped) 180f else 0f,
@@ -59,7 +55,7 @@ fun CardBox(
         label = "flipAnimation"
     )
 
-    /* ---------- CONFIRM-DELETE DIALOG ---------- */
+    /* ---------- DIALOG ---------- */
     if (showDialog) {
         AlertDialog(
             onDismissRequest = { showDialog = false },
@@ -123,7 +119,7 @@ fun CardBox(
                             ) { Icon(Icons.Default.Edit, contentDescription = "Edit") }
 
                             IconButton(
-                                onClick = { showDialog = true }            // ← just open dialog
+                                onClick = { showDialog = true }
                             ) { Icon(Icons.Default.Delete, contentDescription = "Delete") }
                         }
                     }

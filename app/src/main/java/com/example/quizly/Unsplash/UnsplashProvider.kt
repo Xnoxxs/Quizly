@@ -17,10 +17,6 @@ object UnsplashProvider {
 
     private val api = retrofit.create(UnsplashApiService::class.java)
 
-    /**
-     * Executes the network request on Dispatchers.IO so we don’t hit a
-     * NetworkOnMainThreadException and can safely call it from the UI layer.
-     */
     suspend fun fetchPhoto(query: String): UnsplashPhoto? = withContext(Dispatchers.IO) {
         try {
             val response = api.searchPhotos(query, UNSPLASH_KEY)

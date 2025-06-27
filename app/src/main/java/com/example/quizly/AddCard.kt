@@ -8,12 +8,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.background
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.mutableStateOf
@@ -51,7 +48,7 @@ fun AddCard(
                     hostState = snackbarHostState,
                     modifier  = Modifier
                         .align(Alignment.BottomCenter)
-                        .padding(top = 12.dp)          // small inset from status bar
+                        .padding(top = 12.dp)
                 )
             }
         }
@@ -112,7 +109,7 @@ fun AddCard(
                                 message  = "Card added!",
                                 duration = SnackbarDuration.Short
                             )
-                            // clear fields after success
+                            // clear fields
                             card  = ""
                             value = ""
                         } catch (e: Exception) {
@@ -137,56 +134,5 @@ fun AddCard(
     }
 }
 
-
-
-@Composable
-fun ExtraRow(
-    keyText: String, // hello
-    valueText: String, // salut
-    extras: MutableState<Map<String, String>>, // {"hello": "salut", "time": "temp"}
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        // Left Text - bold
-        Text(
-            text = keyText,
-            style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
-            modifier = Modifier.weight(1f)
-        )
-
-        // Center Text - bold, teal
-        Text(
-            text = valueText,
-            style = MaterialTheme.typography.bodyLarge.copy(
-                fontWeight = FontWeight.Bold,
-                color = Color(0xFF00796B) // or MaterialTheme.colorScheme.primary
-            ),
-            modifier = Modifier.weight(1f),
-        )
-
-        // Delete Icon Button - circular black with white icon
-        IconButton(
-            onClick = {
-                // Remove {"hello": "salut"}
-                // from {"hello": "salut", "time": "temp"}
-                extras.value = extras.value - keyText
-
-            },
-            modifier = Modifier
-                .size(36.dp)
-                .background(Color.Black, shape = CircleShape)
-        ) {
-            Icon(
-                imageVector = Icons.Default.Close,
-                contentDescription = "Delete",
-                tint = Color.White
-            )
-        }
-    }
-}
 
 

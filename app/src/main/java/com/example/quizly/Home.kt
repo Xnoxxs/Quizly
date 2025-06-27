@@ -48,8 +48,7 @@ fun MyApp(navController: NavHostController, viewModel: CardViewModel) {
 
     Log.d("MyApp", "cards: $cards")
 
-    /* ---------- State (replaces Riverpod providers) ---------- */
-    var currentMode by remember { mutableStateOf("Words") }
+    var currentMode by remember { mutableStateOf("Cards") }
     var amountOfWords by remember { mutableStateOf(0) }
 
     var currentCard by remember { mutableStateOf<Card?>(null) }
@@ -170,8 +169,8 @@ fun MyApp(navController: NavHostController, viewModel: CardViewModel) {
                     navController = navController,
                     viewModel = viewModel
                 ) {
-                    currentCard = null            // parent owns the state, so it can mutate it
-                    amountOfWords -= 1
+                    currentCard = null
+                    //amountOfWords -= 1
                 }
             }
 
@@ -185,7 +184,6 @@ fun MyApp(navController: NavHostController, viewModel: CardViewModel) {
 fun MyIconButton(icon: androidx.compose.ui.graphics.vector.ImageVector, onClick: () -> Unit) {
     IconButton(onClick) { Icon(icon, null, tint = Color.Black) }
 }
-
 
 @Composable
 fun BigText(text: String) =

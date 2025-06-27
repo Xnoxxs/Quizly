@@ -15,14 +15,14 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await   // await()
+import kotlinx.coroutines.tasks.await
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AuthScreen(navController: NavHostController) {
     val auth          = remember { FirebaseAuth.getInstance() }
-    val snackbarHost  = remember { SnackbarHostState() }      // optional fallback
+    val snackbarHost  = remember { SnackbarHostState() }
     val scope         = rememberCoroutineScope()
 
     var email        by remember { mutableStateOf("hamza.jbk.17@gmail.com") }
@@ -114,7 +114,7 @@ fun AuthScreen(navController: NavHostController) {
                 shape = RoundedCornerShape(12.dp)
             ) { Text("Log in") }
 
-            /*  show UID under the button (optional)  */
+            /*  show UID */
             /*
             currentUid?.let {
                 Spacer(Modifier.height(32.dp))
@@ -140,11 +140,6 @@ fun AuthScreen(navController: NavHostController) {
 
 
 
-/**
- * Signs in with e-mail + password.
- * If already authenticated returns the existing UID.
- * @throws Exception (FirebaseAuthException) if sign-in fails.
- */
 suspend fun loginUser(email: String, password: String): String {
     val auth = FirebaseAuth.getInstance()
 

@@ -11,7 +11,7 @@ data class UnsplashPhoto(val id: String, val urls: UnsplashPhotoUrls, val user: 
 data class UnsplashPhotoUrls(val small: String, val regular: String)
 data class UnsplashUser(val name: String)
 
-// --- API interface -----------------------------------------------------
+// API interface -----------------------------------------------------
 interface UnsplashApiService {
     @GET("search/photos")
     suspend fun searchPhotos(

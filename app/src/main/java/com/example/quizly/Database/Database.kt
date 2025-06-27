@@ -10,9 +10,9 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun cardDao(): CardDao
 
     companion object {
-        @Volatile private var INSTANCE: AppDatabase? = null  // ✅ Use your own class name
+        @Volatile private var INSTANCE: AppDatabase? = null
 
-        fun getInstance(context: Context): AppDatabase {     // ✅ No need for long package reference
+        fun getInstance(context: Context): AppDatabase {
             return INSTANCE ?: synchronized(this) {
                 Room.databaseBuilder(
                     context.applicationContext,

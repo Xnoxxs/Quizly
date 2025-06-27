@@ -1,6 +1,5 @@
 package com.example.quizly
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -42,9 +41,9 @@ fun Search(
 ) {
     var searchText by remember { mutableStateOf("") }
 
-    /* -------- list that reacts to every keystroke ---------- */
+    /* -------- reacts to every keystroke ---------- */
     val filteredCards = remember(searchText, cards) {
-        if (searchText.isBlank()) cards                                    // nothing typed → show all
+        if (searchText.isBlank()) cards
         else cards.filter { it.card.contains(searchText, ignoreCase = true) }
     }
 

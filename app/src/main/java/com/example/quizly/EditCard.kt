@@ -11,14 +11,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.example.quizly.Database.Card
 import com.example.quizly.Database.CardViewModel
 import kotlinx.coroutines.launch
 
-/**
- * EditCard with a **top‑aligned snackbar** that appears after the update is
- * written to the DB.
- */
+
 @Composable
 fun EditCard(
     viewModel: CardViewModel,
@@ -29,7 +25,7 @@ fun EditCard(
     val snackbarHostState = remember { SnackbarHostState() }
     val scope             = rememberCoroutineScope()
 
-    /* ---------- Editable text-field states ---------- */
+    /* ---------- text-field ---------- */
     var cardText  by remember { mutableStateOf("") }
     var cardValue by remember { mutableStateOf("") }
 
@@ -43,16 +39,14 @@ fun EditCard(
         }
     }
 
-    /* ==================== UI ==================== */
     Scaffold(
         snackbarHost = {
-            // Align snackbar at the top center
             Box(Modifier.fillMaxSize()) {
                 SnackbarHost(
                     hostState = snackbarHostState,
                     modifier  = Modifier
                         .align(Alignment.BottomCenter)
-                        .padding(top = 12.dp)   // small top inset
+                        .padding(top = 12.dp)
                 )
             }
         }

@@ -26,10 +26,8 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        /* 1️⃣  make sure Firebase is ready */
-        FirebaseApp.initializeApp(this)          // safe to call even if already init’d
+        FirebaseApp.initializeApp(this)
 
-        /* 3️⃣  everything else in your setContent {} stays the same */
         try {
             setContent {
                 MaterialTheme(colorScheme = lightColorScheme(primary = Color.Black)) {
@@ -52,24 +50,23 @@ class MainActivity : ComponentActivity() {
                         composable("addCard") {
                             AddCard(
                                 viewModel = viewModel,
-                                onBack = { navController.navigateUp() }  // This handles the back navigation
+                                onBack = { navController.navigateUp() }  // back navigation
                             )
                         }
                         composable("addCard") {
                             AddCard(
                                 viewModel = viewModel,
-                                onBack = { navController.navigateUp() }  // This handles the back navigation
+                                onBack = { navController.navigateUp() }  //  back navigation
                             )
                         }
                         composable(
-                            route = "editCard/{cardId}",                       // ← placeholder
+                            route = "editCard/{cardId}",
                             arguments = listOf(
                                 navArgument("cardId") { type = NavType.IntType }
                             )
                         ) { backStackEntry ->
-                            // 1️⃣  throw (or early-return) if arguments are missing
                             val id = backStackEntry.arguments?.getInt("cardId")
-                                ?: return@composable              // or: error("cardId missing")
+                                ?: return@composable              //  error("cardId missing")
                             EditCard(
                                 viewModel = viewModel,
                                 cardId = id,

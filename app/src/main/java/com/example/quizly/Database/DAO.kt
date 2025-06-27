@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface CardDao {
     @Query("SELECT * FROM cards")
-    fun getAllCards(): Flow<List<Card>>  // ✅ Corrected reference
+    fun getAllCards(): Flow<List<Card>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertCard(card: Card)
